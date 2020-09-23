@@ -1,1 +1,7 @@
 config.py
+geckodriver.log
+mynotes.ipynb
+Untitled.ipynb
+__pycache__/config.cpython-37.pyc
+.ipynb_checkpoints/Untitled-checkpoint.ipynb
+.ipynb_checkpoints/mynotes-checkpoint.ipynb
