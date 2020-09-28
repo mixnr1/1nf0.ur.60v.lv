@@ -15,7 +15,6 @@ import config
 start = time.time()
 
 path=config.path
-
 my_list=open(path+'list.txt', 'r')
 options = FirefoxOptions()
 options.add_argument("--incognito")
@@ -43,27 +42,19 @@ for reg in my_list:
             mylist[2]=str("NEDERĪGS")
             mylist[3]=str("Iemesls:"+elem.text.strip())
         elif elem.text.strip() == "Reģistrācijas datums" and mylist[2] == "NEDERĪGS":
-            mylist[4]="Reģistrācijas datums: "+str(elem.next_element.next_element.text.strip())
+            mylist[4]=str(elem.next_element.next_element.text.strip())
+            # mylist[4]="Reģistrācijas datums: "+str(elem.next_element.next_element.text.strip())
         elif elem.text.strip() == "Reģistrācijas datums" and not mylist[2] == "NEDERĪGS":
             mylist[0]=str(reg.rstrip())
             mylist[1]=str(firma)
             mylist[2]=str("DERĪGS")
-            mylist[4]="Reģistrācijas datums:"+str(elem.next_element.next_element.text.strip())
+            mylist[4]=str(elem.next_element.next_element.text.strip())
+            # mylist[4]="Reģistrācijas datums:"+str(elem.next_element.next_element.text.strip())
     for elem in soup.find_all("div", {"class": "ContentLight"}):
         if elem.text.strip() == "Adrese" and not mylist[2] == "NEDERĪGS":
-            mylist[3]="Adrese:"+str(elem.next_element.next_element.text.strip())  
+            mylist[3]="Adrese:"+str(elem.next_element.next_element.text.strip())   
     firmu_list.append(mylist)
     driver.quit()
- 
-sk=0
-for i in my_list:
-    sk+=1
-print("list.txt file containts: "+str(sk)+" registrācijas numurus")
-my_list.close() 
-f_sk=0
-for i in range(1,len(firmu_list)):
-    f_sk+=1
-print("Pirmā fāze pabeigta. Sākotnējā informācija savākta par "+str(f_sk))
 
 json_path = {
     'members':'/persons/members?lang=LV&fillForeignerData=true&printout=false',
@@ -73,11 +64,16 @@ json_path = {
 big_list=[]
 for reg_nr in firmu_list:
     elem=(str(reg_nr[0])[1:10])
-    first_part=str("Reģistrācijas_numurs:"+reg_nr[0]+"|"+\
-        "Nosaukums:"+reg_nr[1]+"|"+\
-        "Status:"+reg_nr[2]+"|"+\
+    first_part=str(reg_nr[0]+"|"+\
+        reg_nr[1]+"|"+\
+        reg_nr[2]+"|"+\
         reg_nr[3]+"|"+\
         reg_nr[4]+"|")
+    # first_part=str("Reģistrācijas_numurs:"+reg_nr[0]+"|"+\
+    #     "Nosaukums:"+reg_nr[1]+"|"+\
+    #     "Status:"+reg_nr[2]+"|"+\
+    #     reg_nr[3]+"|"+\
+    #     reg_nr[4]+"|")
     for key in json_path:
         if key == "members":
             url='https://info.ur.gov.lv/api/legalentity/api/'+elem+json_path[key]
@@ -235,6 +231,12 @@ for reg_nr in firmu_list:
                                     "personCode:"+row['personCode']+"|"+\
                                     "residesCountryText:"+row['residesCountryText']+"|"+\
                                     "citizenCountryText:"+row['citizenCountryText'])
+
+#write first line to file
+title_line="Reģistrācijas_numurs|Nosaukums|Status|Informācija|Reģistrācijas_datums|6|7|8|9|10|11|"
+with open(path+"result.csv", 'w') as writer:
+        writer.write(title_line+"\n")
+        writer.close()
 
 #write big_list to file
 result_file=open(path+"result.csv",'a')
