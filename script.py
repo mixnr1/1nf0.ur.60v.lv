@@ -22,9 +22,10 @@ options.add_argument("--headless")
 result_file=open(path+"result.csv",'a')
 firmu_list=[]
 for reg in my_list:
+    print('https://info.ur.gov.lv/?#/legal-entity/'+reg)
     driver = webdriver.Firefox(options=options, executable_path=config.driver_path)
     driver.get('https://info.ur.gov.lv/?#/legal-entity/'+reg)
-    element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "react-tabs-0")))
+    element = WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.ID, "react-tabs-0")))
     Url=str('https://info.ur.gov.lv/?#/legal-entity/'+reg)
     soup=BeautifulSoup(driver.page_source, 'lxml')
     firma=soup.find("h1", {"class": "Headline1"}).text.strip()
@@ -78,6 +79,7 @@ for reg_nr in firmu_list:
         if key == "members":
             url='https://info.ur.gov.lv/api/legalentity/api/'+elem+json_path[key]
             response = requests.get(url)
+            print(url)
             dati = response.json()
             if('records') in dati:
                 if len(dati['records']) > 1:
@@ -85,29 +87,37 @@ for reg_nr in firmu_list:
                         for key in dati['records'][subelem]:
                             if dati['records'][subelem][key]==("FOR_ENTITY"):
                                 big_list.append(first_part+"MEMBERS"+"|"+\
-                                    "fullname:"+dati['records'][subelem]['name']+"|"+\
-                                    "registrationNumber:"+str(dati['records'][subelem]['registrationNumber'])+"|"+\
+                                    # "fullname:"+dati['records'][subelem]['name']+"|"+\
+                                    # "registrationNumber:"+str(dati['records'][subelem]['registrationNumber'])+"|"+\
+                                    dati['records'][subelem]['name']+"|"+\
+                                    str(dati['records'][subelem]['registrationNumber'])+"|"+\
                                     "sharePercent:"+str(dati['records'][subelem]['sharePercent'])+"|"+\
                                     "shareCount:"+str(dati['records'][subelem]['shareCount'])+"|"+\
                                     "shareValue:"+str(dati['records'][subelem]["shareValue"]))
                             if dati['records'][subelem][key]==("LVENTITY"):
                                 big_list.append(first_part+"MEMBERS"+"|"+\
-                                    "fullname:"+dati['records'][subelem]['name']+"|"+\
-                                    "registrationNumber:"+dati['records'][subelem]['registrationNumber']+"|"+\
+                                    # "fullname:"+dati['records'][subelem]['name']+"|"+\
+                                    # "registrationNumber:"+dati['records'][subelem]['registrationNumber']+"|"+\
+                                    dati['records'][subelem]['name']+"|"+\
+                                    dati['records'][subelem]['registrationNumber']+"|"+\
                                     "sharePercent:"+str(dati['records'][subelem]['sharePercent'])+"|"+\
                                     "shareCount:"+str(dati['records'][subelem]['shareCount'])+"|"+\
                                     "shareValue:"+str(dati['records'][subelem]["shareValue"]))
                             if dati['records'][subelem][key]==("PERSON"):
                                 big_list.append(first_part+"MEMBERS"+"|"+\
-                                "fullname:"+dati['records'][subelem]['name']+"|"+\
-                                "personCode:"+dati['records'][subelem]['personCode']+"|"+\
+                                # "fullname:"+dati['records'][subelem]['name']+"|"+\
+                                # "personCode:"+dati['records'][subelem]['personCode']+"|"+\
+                                dati['records'][subelem]['name']+"|"+\
+                                dati['records'][subelem]['personCode']+"|"+\
                                 "sharePercent:"+str(dati['records'][subelem]['sharePercent'])+"|"+\
                                 "shareCount:"+str(dati['records'][subelem]['shareCount'])+"|"+\
                                 "shareValue:"+str(dati['records'][subelem]["shareValue"]))
                             if dati['records'][subelem][key]==("FOR_PERSON"):
                                 big_list.append(first_part+"MEMBERS"+"|"+\
-                                    "fullname:"+dati['records'][subelem]['name']+"|"+\
-                                    "personCode:"+dati['records'][subelem]['personCode']+"|"+\
+                                    # "fullname:"+dati['records'][subelem]['name']+"|"+\
+                                    # "personCode:"+dati['records'][subelem]['personCode']+"|"+\
+                                    dati['records'][subelem]['name']+"|"+\
+                                    dati['records'][subelem]['personCode']+"|"+\
                                     "sharePercent:"+str(dati['records'][subelem]['sharePercent'])+"|"+\
                                     "shareCount:"+str(dati['records'][subelem]['shareCount'])+"|"+\
                                     "shareValue:"+str(dati['records'][subelem]["shareValue"]))
@@ -116,35 +126,44 @@ for reg_nr in firmu_list:
                         if('name' in row):
                             if row["entityType"] == "FOR_ENTITY":
                                 big_list.append(first_part+"MEMBERS"+"|"+\
-                                    "fullname:"+row['name']+"|"+\
-                                    "registrationNumber:"+str(row['registrationNumber'])+"|"+\
+                                    # "fullname:"+row['name']+"|"+\
+                                    # "registrationNumber:"+str(row['registrationNumber'])+"|"+\
+                                    row['name']+"|"+\
+                                    str(row['registrationNumber'])+"|"+\
                                     "sharePercent:"+str(row['sharePercent'])+"|"+\
                                     "shareCount:"+str(row['shareCount'])+"|"+\
                                     "shareValue:"+str(row["shareValue"]))
                             if row["entityType"] == "LVENTITY":
                                 big_list.append(first_part+"MEMBERS"+"|"+\
-                                    "fullname:"+row['name']+"|"+\
-                                    "registrationNumber:"+row['registrationNumber']+"|"+\
+                                    # "fullname:"+row['name']+"|"+\
+                                    # "registrationNumber:"+row['registrationNumber']+"|"+\
+                                    row['name']+"|"+\
+                                    row['registrationNumber']+"|"+\
                                     "sharePercent:"+str(row['sharePercent'])+"|"+\
                                     "shareCount:"+str(row['shareCount'])+"|"+\
                                     "shareValue:"+str(row["shareValue"]))
                             if row["entityType"]=="PERSON":
                                 big_list.append(first_part+"MEMBERS"+"|"+\
-                                    "fullname:"+row['name']+"|"+\
-                                    "personCode:"+row['personCode']+"|"+\
+                                    # "fullname:"+row['name']+"|"+\
+                                    # "personCode:"+row['personCode']+"|"+\
+                                    row['name']+"|"+\
+                                    row['personCode']+"|"+\
                                     "sharePercent:"+str(row['sharePercent'])+"|"+\
                                     "shareCount:"+str(row['shareCount'])+"|"+\
                                     "shareValue:"+str(row["shareValue"]))
                             if row["entityType"]=="FOR_PERSON":
                                 big_list.append(first_part+"MEMBERS"+"|"+\
-                                    "fullname:"+row['name']+"|"+\
-                                    "personCode:"+row['personCode']+"|"+\
+                                    # "fullname:"+row['name']+"|"+\
+                                    # "personCode:"+row['personCode']+"|"+\
+                                    row['name']+"|"+\
+                                    row['personCode']+"|"+\
                                     "sharePercent:"+str(row['sharePercent'])+"|"+\
                                     "shareCount:"+str(row['shareCount'])+"|"+\
                                     "shareValue:"+str(row["shareValue"]))
         if key == "procurations":
             url='https://info.ur.gov.lv/api/legalentity/api/'+elem+json_path[key]
             response = requests.get(url)
+            print(url)
             dati = response.json()
             if('records') in dati:
                 if len(dati['records']) >= 1:
@@ -154,31 +173,40 @@ for reg_nr in firmu_list:
                                 for subkey in dati['records'][subelem][key]:
                                     if subkey["entityType"]=="PERSON":
                                         big_list.append(first_part+"PROCURATIONS"+"|"+\
-                                        "fullname:"+subkey['name']+" "+subkey['surname']+"|"+\
-                                        "personCode:"+subkey['personCode']+"|"+\
+                                        # "fullname:"+subkey['name']+" "+subkey['surname']+"|"+\
+                                        # "personCode:"+subkey['personCode']+"|"+\
+                                        subkey['name']+" "+subkey['surname']+"|"+\
+                                        subkey['personCode']+"|"+\
                                         "country:"+"Latvijas Republika")
                                     if subkey["entityType"]=="FOR_PERSON":
                                         big_list.append(first_part+"PROCURATIONS"+"|"+\
-                                        "fullname:"+subkey['name']+" "+subkey['surname']+"|"+\
-                                        "personCode:"+subkey['personCode']+"|"+\
+                                        # "fullname:"+subkey['name']+" "+subkey['surname']+"|"+\
+                                        # "personCode:"+subkey['personCode']+"|"+\
+                                        subkey['name']+" "+subkey['surname']+"|"+\
+                                        subkey['personCode']+"|"+\
                                         "country:"+subkey["identityDocument"]["country"])
         if key == "officers":
             url='https://info.ur.gov.lv/api/legalentity/api/'+elem+json_path[key]
             response = requests.get(url)
+            print(url)
             dati = response.json()
             if len(dati['records']) > 1:
                 for subelem in range(0,len(dati['records'])):
                     for key in dati['records'][subelem]:
                             if dati['records'][subelem][key]==("FOR_PERSON"):
                                 big_list.append(first_part+"OFFICERS"+"|"+\
-                                    "fullname:"+dati['records'][subelem]['fullname']+"|"+\
-                                    "personCode:"+dati['records'][subelem]['personCode']+"|"+\
+                                    # "fullname:"+dati['records'][subelem]['fullname']+"|"+\
+                                    # "personCode:"+dati['records'][subelem]['personCode']+"|"+\
+                                    dati['records'][subelem]['fullname']+"|"+\
+                                    dati['records'][subelem]['personCode']+"|"+\
                                     "positionText:"+dati['records'][subelem]['positionText']+"|"+\
                                     "country:"+dati['records'][subelem]['identityDocument']["country"])
                             if dati['records'][subelem][key]==("PERSON"):
                                 big_list.append(first_part+"OFFICERS"+"|"+\
-                                    "fullname:"+dati['records'][subelem]['fullname']+"|"+\
-                                    "personCode:"+dati['records'][subelem]['personCode']+"|"+\
+                                    # "fullname:"+dati['records'][subelem]['fullname']+"|"+\
+                                    # "personCode:"+dati['records'][subelem]['personCode']+"|"+\
+                                    dati['records'][subelem]['fullname']+"|"+\
+                                    dati['records'][subelem]['personCode']+"|"+\
                                     "positionText:"+dati['records'][subelem]['positionText']+"|"+\
                                     "country:"+"Latvijas Republika")
             else:
@@ -186,19 +214,24 @@ for reg_nr in firmu_list:
                     if('fullname' in row):
                         if row['identityDocument']==None:
                             big_list.append(first_part+"OFFICERS"+"|"+\
-                                "fullname:"+row['fullname']+"|"+\
-                                "personCode:"+row['personCode']+"|"+\
+                                # "fullname:"+row['fullname']+"|"+\
+                                # "personCode:"+row['personCode']+"|"+\
+                                row['fullname']+"|"+\
+                                row['personCode']+"|"+\
                                 "positionText:"+row['positionText']+"|"+\
                                 "country:"+"Latvijas Republika")
                     else:
                         big_list.append(first_part+"OFFICERS"+"|"+\
-                            "fullname:"+row['fullname']+"|"+\
-                            "personCode:"+row['personCode']+"|"+\
+                            # "fullname:"+row['fullname']+"|"+\
+                            # "personCode:"+row['personCode']+"|"+\
+                            row['fullname']+"|"+\
+                            row['personCode']+"|"+\
                             "positionText:"+row['positionText']+"|"+\
                             "country:"+row['identityDocument']["country"])
         if key == "beneficiaries":
             url='https://info.ur.gov.lv/api/legalentity/api/'+elem+json_path[key]
             response = requests.get(url)
+            print(url)
             dati = response.json()
             if('records') in dati:
                 if len(dati['records']) > 1:
@@ -206,14 +239,18 @@ for reg_nr in firmu_list:
                         for key in dati['records'][subelem]:
                             if dati['records'][subelem][key]==("FOR_PERSON"):
                                 big_list.append(first_part+"BENEFICIARIES"+"|"+\
-                                    "fullname:"+dati['records'][subelem]['firstname']+" "+dati['records'][subelem]['lastname']+"|"+\
-                                    "personCode:"+dati['records'][subelem]['personCode']+"|"+\
+                                    # "fullname:"+dati['records'][subelem]['firstname']+" "+dati['records'][subelem]['lastname']+"|"+\
+                                    # "personCode:"+dati['records'][subelem]['personCode']+"|"+\
+                                    dati['records'][subelem]['firstname']+" "+dati['records'][subelem]['lastname']+"|"+\
+                                    dati['records'][subelem]['personCode']+"|"+\
                                     "residesCountryText:"+dati['records'][subelem]['residesCountryText']+"|"+\
                                     "citizenCountryText:"+dati['records'][subelem]['citizenCountryText'])
                             if dati['records'][subelem][key]==("PERSON"):
                                 big_list.append(first_part+"BENEFICIARIES"+"|"+\
-                                    "fullname:"+dati['records'][subelem]['firstname']+" "+dati['records'][subelem]['lastname']+"|"+\
-                                    "personCode:"+dati['records'][subelem]['personCode']+"|"+\
+                                    # "fullname:"+dati['records'][subelem]['firstname']+" "+dati['records'][subelem]['lastname']+"|"+\
+                                    # "personCode:"+dati['records'][subelem]['personCode']+"|"+\
+                                    dati['records'][subelem]['firstname']+" "+dati['records'][subelem]['lastname']+"|"+\
+                                    dati['records'][subelem]['personCode']+"|"+\
                                     "residesCountryText:"+dati['records'][subelem]['residesCountryText']+"|"+\
                                     "citizenCountryText:"+dati['records'][subelem]['citizenCountryText'])
                 else:                         
@@ -221,19 +258,24 @@ for reg_nr in firmu_list:
                         if('firstname' in row):
                             if row["entityType"] == "FOR_PERSON":
                                 big_list.append(first_part+"BENEFICIARIES"+"|"+\
-                                "fullname:"+row['firstname']+" "+row['lastname']+"|"+\
-                                "personCode:"+row['personCode']+"|"+\
+                                # "fullname:"+row['firstname']+" "+row['lastname']+"|"+\
+                                # "personCode:"+row['personCode']+"|"+\
+                                row['firstname']+" "+row['lastname']+"|"+\
+                                row['personCode']+"|"+\
                                 "residesCountryText:"+row['residesCountryText']+"|"+\
                                 "citizenCountryText:"+row['citizenCountryText'])
                             if row["entityType"]=="PERSON":
                                 big_list.append(first_part+"BENEFICIARIES"+"|"+\
-                                    "fullname:"+row['firstname']+" "+row['lastname']+"|"+\
-                                    "personCode:"+row['personCode']+"|"+\
+                                    # "fullname:"+row['firstname']+" "+row['lastname']+"|"+\
+                                    # "personCode:"+row['personCode']+"|"+\
+                                    row['firstname']+" "+row['lastname']+"|"+\
+                                    row['personCode']+"|"+\
                                     "residesCountryText:"+row['residesCountryText']+"|"+\
                                     "citizenCountryText:"+row['citizenCountryText'])
 
 #write first line to file
-title_line="Reģistrācijas_numurs|Nosaukums|Status|Informācija|Reģistrācijas_datums|6|7|8|9|10|11|"
+# title_line="Reģistrācijas_numurs|Nosaukums|Status|Informācija|Reģistrācijas_datums|6|7|8|9|10|11|"
+title_line="Reģistrācijas_numurs|Nosaukums|Status|Informācija|Reģistrācijas_datums|Loma|fullname|personCode/registrationNumber|9|10|11|"
 with open(path+"result.csv", 'w') as writer:
         writer.write(title_line+"\n")
         writer.close()
